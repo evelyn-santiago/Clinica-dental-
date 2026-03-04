@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Odontólogo - Clínica Dental Sonrisa Perfecta</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2a9d8f;
+            --secondary: #264653;
+            --accent: #e9c46a;
+            --danger: #e76f51;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background-color: var(--secondary);
+            color: white;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .nav-item {
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .badge-primary {
+            background-color: rgba(42, 157, 143, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-warning {
+            background-color: rgba(233, 196, 106, 0.2);
+            color: #b78a0e;
+        }
+
+        .badge-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: rgba(42, 157, 143, 0.1);
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Spinner de carga */
+        .spinner-row td {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar p-0">
+                <div class="text-center p-4 border-bottom border-light border-opacity-10">
+                    <img src="https://static.vecteezy.com/system/resources/previews/017/765/385/original/cute-teeth-cartoon-character-isolated-on-white-background-free-vector.jpg"
+                        alt="Logo" class="logo mb-3">
+                    <h5 class="mb-0">Sonrisa Perfecta</h5>
+                </div>
+
+                <ul class="nav flex-column mt-3">
+                    <li class="nav-item active p-3" onclick="mostrarSeccion('dashboard', this)">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <span>Panel Principal</span>
+                    </li>
+                    <li class="nav-item p-3" onclick="mostrarSeccion('pacientes', this)">
+                        <i class="fas fa-users me-2"></i>
+                        <span>Pacientes</span>
+                    </li>
+                    <li class="nav-item p-3" onclick="mostrarSeccion('historial', this)">
+                        <i class="fas fa-history me-2"></i>
+                        <span>Historial de Citas</span>
+                    </li>
+                    <li class="nav-item p-3" onclick="mostrarSeccion('facturacion', this)">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                        <span>Facturación</span>
+                    </li>
+                </ul>
+
+                <div
+                    class="position-absolute bottom-0 w-100 p-3 border-top border-light border-opacity-10 d-flex align-items-center">
+                    <img id="sidebarAvatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Usuario"
+                        class="user-avatar me-2">
+                    <div>
+                        <div class="fw-bold" id="sidebarNombre">Cargando...</div>
+                        <small class="text-white-50" id="sidebarRol">—</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                    <h1 class="h2">Panel del Odontólogo</h1>
+                    <button class="btn btn-outline-primary" id="btnLogout">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
+
+                <!-- Sección Dashboard -->
+                <div id="seccion-dashboard">
+                    <!-- Cards Resumen -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Citas Hoy</h6>
+                                    <div class="card-value" id="statCitasHoy">
+                                        <span class="spinner-border spinner-border-sm text-secondary"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Pacientes Atendidos</h6>
+                                    <div class="card-value" id="statPacientes">
+                                        <span class="spinner-border spinner-border-sm text-secondary"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Total Citas Pendientes</h6>
+                                    <div class="card-value" id="statPendientes">
+                                        <span class="spinner-border spinner-border-sm text-secondary"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Citas Pendientes -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Citas Pendientes</h5>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                <i class="fas fa-plus me-1"></i> Nueva Cita
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Paciente</th>
+                                            <th>Fecha/Hora</th>
+                                            <th>Procedimiento</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaCitas">
+                                        <tr class="spinner-row">
+                                            <td colspan="5"><i class="fas fa-spinner fa-spin me-2"></i>Cargando citas
+                                                desde
+                                                la base de datos...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Historial -->
+                <div id="seccion-historial" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-history me-2"></i> Historial Completo de Citas</h5>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="busquedaHistorial" class="form-control form-control-sm"
+                                    placeholder="Buscar paciente...">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="cargarHistorial()"><i
+                                        class="fas fa-sync-alt"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Paciente</th>
+                                            <th>Fecha</th>
+                                            <th>Procedimiento</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaHistorial">
+                                        <tr class="spinner-row">
+                                            <td colspan="5"><i class="fas fa-spinner fa-spin me-2"></i>Cargando
+                                                historial...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Pacientes -->
+                <div id="seccion-pacientes" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-users me-2"></i> Gestión de Pacientes</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#patientModal">
+                                <i class="fas fa-user-plus me-1"></i> Nuevo Paciente
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nombre Completo</th>
+                                            <th>Teléfono</th>
+                                            <th>Email</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaListaPacientes">
+                                        <tr class="spinner-row">
+                                            <td colspan="4"><i class="fas fa-spinner fa-spin me-2"></i>Cargando
+                                                pacientes...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Facturación -->
+                <div id="seccion-facturacion" style="display: none;">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i> Facturación y Cobros</h5>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary" onclick="abrirModalFactura()">
+                                    <i class="fas fa-plus me-1"></i> Nueva Factura
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="cargarFacturas()"><i
+                                        class="fas fa-sync-alt"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Paciente / Procedimiento</th>
+                                            <th>Fecha Cita</th>
+                                            <th>Monto</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaFacturas">
+                                        <tr class="spinner-row">
+                                            <td colspan="6"><i class="fas fa-spinner fa-spin me-2"></i>Cargando
+                                                facturas...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para generar factura -->
+                <div class="modal fade" id="facturaModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Generar Factura</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="facturaModalAlert" class="alert alert-danger d-none"></div>
+                                <form id="formNuevaFactura">
+                                    <div class="mb-3">
+                                        <label for="facCita" class="form-label">Cita Pendiente de Cobro</label>
+                                        <select id="facCita" class="form-select" required>
+                                            <option value="">Seleccione una cita completada</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="facMonto" class="form-label">Monto a Cobrar ($)</label>
+                                        <input type="number" id="facMonto" class="form-control" step="0.01" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="facMetodo" class="form-label">Método de Pago</label>
+                                        <select id="facMetodo" class="form-select" required>
+                                            <option value="efectivo">Efectivo</option>
+                                            <option value="tarjeta">Tarjeta</option>
+                                            <option value="transferencia">Transferencia</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100" id="btnGuardarFactura">
+                                        <i class="fas fa-check-circle me-1"></i> Registrar Pago
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nuevo paciente -->
+    <div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Nuevo Paciente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="patientModalAlert" class="alert alert-danger d-none"></div>
+                    <form id="formNuevoPaciente">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pNombre" class="form-label">Nombre</label>
+                                <input type="text" id="pNombre" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pApellido" class="form-label">Apellido</label>
+                                <input type="text" id="pApellido" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pTelefono" class="form-label">Teléfono</label>
+                                <input type="tel" id="pTelefono" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pEmail" class="form-label">Email</label>
+                                <input type="email" id="pEmail" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pFechaNac" class="form-label">Fecha Nacimiento</label>
+                            <input type="date" id="pFechaNac" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pDireccion" class="form-label">Dirección</label>
+                            <input type="text" id="pDireccion" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100" id="btnGuardarPaciente">
+                            <i class="fas fa-user-check me-1"></i> Registrar Paciente
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nueva cita -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agendar Nueva Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalAlert" class="alert alert-danger d-none"></div>
+                    <form id="formNuevaCita">
+                        <div class="mb-3">
+                            <label for="patient" class="form-label d-flex justify-content-between">
+                                Paciente
+                                <a href="#" class="small text-decoration-none" data-bs-toggle="modal"
+                                    data-bs-target="#patientModal">+ Nuevo</a>
+                            </label>
+                            <select id="patient" class="form-select" required>
+                                <option value="">Seleccione un paciente</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="date" class="form-label">Fecha</label>
+                                <input type="date" id="date" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="time" class="form-label">Hora</label>
+                                <input type="time" id="time" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="procedure" class="form-label">Procedimiento</label>
+                            <select id="procedure" class="form-select" required>
+                                <option value="">Seleccione un procedimiento</option>
+                                <option value="Limpieza Dental">Limpieza Dental</option>
+                                <option value="Extracción">Extracción</option>
+                                <option value="Ortodoncia">Ortodoncia</option>
+                                <option value="Blanqueamiento">Blanqueamiento</option>
+                                <option value="Revisión">Revisión</option>
+                                <option value="Carilla">Carilla</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notas</label>
+                            <textarea id="notes" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" id="btnGuardarCita">
+                            <i class="fas fa-calendar-plus me-1"></i> Agendar Cita
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar cita -->
+    <div class="modal fade" id="editAppointmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modificar Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="editModalAlert" class="alert alert-danger d-none"></div>
+                    <form id="formEditarCita">
+                        <input type="hidden" id="editCitaId">
+                        <div class="mb-3">
+                            <label class="form-label">Paciente</label>
+                            <input type="text" id="editPatientName" class="form-control" readonly>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editDate" class="form-label">Fecha</label>
+                                <input type="date" id="editDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editTime" class="form-label">Hora</label>
+                                <input type="time" id="editTime" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editProcedure" class="form-label">Procedimiento</label>
+                            <select id="editProcedure" class="form-select" required>
+                                <option value="Limpieza Dental">Limpieza Dental</option>
+                                <option value="Extracción">Extracción</option>
+                                <option value="Ortodoncia">Ortodoncia</option>
+                                <option value="Blanqueamiento">Blanqueamiento</option>
+                                <option value="Revisión">Revisión</option>
+                                <option value="Carilla">Carilla</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editNotes" class="form-label">Notas</label>
+                            <textarea id="editNotes" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100" id="btnActualizarCita">
+                            <i class="fas fa-save me-1"></i> Guardar Cambios
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmar cancelación -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancelar Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea cancelar esta cita?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="btnConfirmarCancelar">Sí, cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ─────────────────────────────────────────────────────────────
+        //  Configuración
+        // ─────────────────────────────────────────────────────────────
+        const API_BASE = 'http://localhost:8080/api';
+
+        // ─────────────────────────────────────────────────────────────
+        //  Verificar sesión (si no hay usuario, volver al login)
+        // ─────────────────────────────────────────────────────────────
+        const usuarioData = JSON.parse(sessionStorage.getItem('usuario') || 'null');
+        if (!usuarioData) {
+            window.location.href = 'logi.html';
+        } else {
+            document.getElementById('sidebarNombre').textContent = usuarioData.nombre;
+            document.getElementById('sidebarRol').textContent = usuarioData.rol.charAt(0).toUpperCase() + usuarioData.rol.slice(1);
+            if (usuarioData.avatar_url) {
+                document.getElementById('sidebarAvatar').src = usuarioData.avatar_url;
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Cerrar sesión
+        // ─────────────────────────────────────────────────────────────
+        document.getElementById('btnLogout').addEventListener('click', function () {
+            sessionStorage.removeItem('usuario');
+            window.location.href = 'logi.html';
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Helpers de estado de cita
+        // ─────────────────────────────────────────────────────────────
+        function badgeEstado(estado) {
+            const mapa = {
+                confirmada: '<span class="badge badge-primary">Confirmada</span>',
+                pendiente: '<span class="badge badge-warning">Por confirmar</span>',
+                completada: '<span class="badge badge-success">Completada</span>',
+                cancelada: '<span class="badge bg-secondary text-white">Cancelada</span>',
+            };
+            return mapa[estado] || estado;
+        }
+
+        function formatFecha(fechaStr) {
+            if (!fechaStr) return '—';
+            const [y, m, d] = fechaStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function formatHora(horaStr) {
+            if (!horaStr) return '';
+            return horaStr.substring(0, 5);   // HH:MM
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Cargar estadísticas del panel
+        // ─────────────────────────────────────────────────────────────
+        async function cargarResumen() {
+            try {
+                const res = await fetch(`${API_BASE}/citas.php?resumen=1`);
+                const data = await res.json();
+                document.getElementById('statCitasHoy').textContent = data.citas_hoy ?? '—';
+                document.getElementById('statPacientes').textContent = data.pacientes_atendidos ?? '—';
+            } catch (e) {
+                document.getElementById('statCitasHoy').textContent = '—';
+                document.getElementById('statPacientes').textContent = '—';
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Cargar citas pendientes / confirmadas
+        // ─────────────────────────────────────────────────────────────
+        let citaAEliminarId = null;
+
+        async function cargarCitas() {
+            const tbody = document.getElementById('tablaCitas');
+            tbody.innerHTML = '<tr class="spinner-row"><td colspan="5"><i class="fas fa-spinner fa-spin me-2"></i>Cargando...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_BASE}/citas.php`);
+                const citas = await res.json();
+
+                document.getElementById('statPendientes').textContent = citas.length;
+
+                if (!citas.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No hay citas pendientes</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = citas.map(c => `
+                    <tr>
+                        <td>${c.paciente}</td>
+                        <td>${formatFecha(c.fecha)} - ${formatHora(c.hora)}</td>
+                        <td>${c.procedimiento}</td>
+                        <td>${badgeEstado(c.estado)}</td>
+                        <td>
+                            <button class="action-btn btn btn-sm me-1" title="Confirmar"
+                                style="background-color:var(--primary);color:white;"
+                                onclick="confirmarCita(${c.id})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="action-btn btn btn-sm me-1" title="Completar"
+                                style="background-color:#28a745;color:white;"
+                                onclick="completarCita(${c.id})">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                            <button class="action-btn btn btn-sm me-1" title="Editar"
+                                style="background-color:var(--accent);color:black;"
+                                onclick="iniciarEdicion('${c.id}', '${c.paciente.replace(/'/g, "\\'")}', '${c.fecha}', '${c.hora}', '${c.procedimiento}', '${c.notas ? c.notas.replace(/'/g, "\\'") : ""}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn btn btn-sm" title="Cancelar"
+                                style="background-color:var(--danger);color:white;"
+                                onclick="iniciarCancelar(${c.id})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-3">⚠️ Error al conectar con la base de datos</td></tr>';
+                document.getElementById('statPendientes').textContent = '—';
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Cargar historial de citas completadas
+        // ─────────────────────────────────────────────────────────────
+        async function cargarHistorial() {
+            const tbody = document.getElementById('tablaHistorial');
+            tbody.innerHTML = '<tr class="spinner-row"><td colspan="5"><i class="fas fa-spinner fa-spin me-2"></i>Cargando...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_BASE}/citas.php?historial=1`);
+                const citas = await res.json();
+
+                if (!citas.length) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin historial de citas</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = citas.map(c => `
+                    <tr>
+                        <td>${c.paciente}</td>
+                        <td>${formatFecha(c.fecha)}</td>
+                        <td>${c.procedimiento}</td>
+                        <td>${badgeEstado(c.estado)}</td>
+                        <td>
+                            <button class="action-btn btn btn-sm" title="Ver detalle"
+                                style="background-color:var(--primary);color:white;"
+                                onclick="verDetalleCita(${c.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-3">⚠️ Error al cargar historial</td></tr>';
+            }
+        }
+
+        function verDetalleCita(id) {
+            alert('Detalle de la cita ID: ' + id + '\nFuncionalidad en desarrollo para ver historial clínico.');
+        }
+
+        // Buscador de historial
+        document.getElementById('busquedaHistorial')?.addEventListener('keyup', function (e) {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#tablaHistorial tr:not(.spinner-row)');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Navegación entre secciones
+        // ─────────────────────────────────────────────────────────────
+        function mostrarSeccion(id, element) {
+            // Ocultar todas
+            document.getElementById('seccion-dashboard').style.display = 'none';
+            document.getElementById('seccion-historial').style.display = 'none';
+
+            // Mostrar la elegida
+            document.getElementById('seccion-' + id).style.display = 'block';
+
+            // Actualizar clases active en sidebar
+            document.querySelectorAll('.nav-item').forEach(li => li.classList.remove('active'));
+            element.classList.add('active');
+
+            // Recargar datos si es historial o facturacion
+            if (id === 'historial') cargarHistorial();
+            if (id === 'facturacion') cargarFacturas();
+            if (id === 'pacientes') cargarListaPacientes();
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Pacientes
+        // ─────────────────────────────────────────────────────────────
+        async function cargarListaPacientes() {
+            const tbody = document.getElementById('tablaListaPacientes');
+            tbody.innerHTML = '<tr class="spinner-row"><td colspan="4"><i class="fas fa-spinner fa-spin me-2"></i>Cargando...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_BASE}/pacientes.php`);
+                const data = await res.json();
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td>${p.nombre} ${p.apellido}</td>
+                        <td>${p.telefono || '-'}</td>
+                        <td>${p.email || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="alert('Editar paciente ID: ${p.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar pacientes</td></tr>';
+            }
+        }
+
+        document.getElementById('formNuevoPaciente').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardarPaciente');
+            btn.disabled = true;
+
+            const payload = {
+                nombre: document.getElementById('pNombre').value,
+                apellido: document.getElementById('pApellido').value,
+                telefono: document.getElementById('pTelefono').value,
+                email: document.getElementById('pEmail').value,
+                fecha_nacimiento: document.getElementById('pFechaNac').value,
+                direccion: document.getElementById('pDireccion').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/pacientes.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('patientModal')).hide();
+                    document.getElementById('formNuevoPaciente').reset();
+                    document.getElementById('patientModalAlert').classList.add('d-none'); // Esconder alerta
+
+                    // Recargar listas
+                    cargarListaPacientes();
+                    cargarPacientes(); // La función que llena el select de citas
+                    alert('Paciente registrado con éxito');
+                } else {
+                    const alerta = document.getElementById('patientModalAlert');
+                    alerta.textContent = data.error || 'No se pudo registrar al paciente';
+                    alerta.classList.remove('d-none');
+                }
+            } catch (err) {
+                alert('Error de conexión');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Limpiar alertas al abrir el modal de paciente
+        document.getElementById('patientModal').addEventListener('show.bs.modal', function () {
+            document.getElementById('patientModalAlert').classList.add('d-none');
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Facturación
+        // ─────────────────────────────────────────────────────────────
+        async function cargarFacturas() {
+            const tbody = document.getElementById('tablaFacturas');
+            tbody.innerHTML = '<tr class="spinner-row"><td colspan="6"><i class="fas fa-spinner fa-spin me-2"></i>Cargando facturas...</td></tr>';
+
+            try {
+                const res = await fetch(`${API_BASE}/facturacion.php`);
+                const data = await res.json();
+
+                if (!data.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No hay facturas registradas</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(f => `
+                    <tr>
+                        <td>#${f.id}</td>
+                        <td>
+                            <div class="fw-bold">${f.paciente}</div>
+                            <small class="text-muted">${f.procedimiento}</small>
+                        </td>
+                        <td>${formatFecha(f.fecha)}</td>
+                        <td class="fw-bold">$${parseFloat(f.monto).toLocaleString()}</td>
+                        <td><span class="badge bg-success">Pagado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="alert('Imprimiendo factura #${f.id}...')">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar facturas</td></tr>';
+            }
+        }
+
+        async function abrirModalFactura() {
+            const select = document.getElementById('facCita');
+            select.innerHTML = '<option value="">Cargando citas...</option>';
+
+            try {
+                // Obtener citas completadas
+                const res = await fetch(`${API_BASE}/citas.php?historial=1`);
+                const citas = await res.json();
+
+                if (!citas.length) {
+                    select.innerHTML = '<option value="">Sin citas por cobrar</option>';
+                } else {
+                    select.innerHTML = '<option value="">Seleccione una cita</option>' +
+                        citas.map(c => `<option value="${c.id}">${c.paciente} - ${c.procedimiento} (${formatFecha(c.fecha)})</option>`).join('');
+                }
+
+                new bootstrap.Modal(document.getElementById('facturaModal')).show();
+            } catch (e) {
+                alert('Error al cargar citas para facturar');
+            }
+        }
+
+        document.getElementById('formNuevaFactura').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardarFactura');
+            btn.disabled = true;
+
+            const payload = {
+                cita_id: document.getElementById('facCita').value,
+                monto: document.getElementById('facMonto').value,
+                metodo_pago: document.getElementById('facMetodo').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/facturacion.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('facturaModal')).hide();
+                    document.getElementById('formNuevaFactura').reset();
+                    cargarFacturas();
+                    cargarResumen(); // Actualizar pacientes atendidos si es necesario
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo registrar Pago'));
+                }
+            } catch (err) {
+                alert('Error de conexión');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Acciones sobre citas
+        // ─────────────────────────────────────────────────────────────
+        async function cambiarEstado(id, estado) {
+            try {
+                await fetch(`${API_BASE}/citas.php`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, estado })
+                });
+                cargarCitas();
+                cargarHistorial();
+                cargarResumen();
+            } catch (e) {
+                alert('Error al actualizar la cita');
+            }
+        }
+
+        function confirmarCita(id) { cambiarEstado(id, 'confirmada'); }
+        function completarCita(id) { cambiarEstado(id, 'completada'); }
+
+        function iniciarCancelar(id) {
+            citaAEliminarId = id;
+            new bootstrap.Modal(document.getElementById('cancelModal')).show();
+        }
+
+        document.getElementById('btnConfirmarCancelar').addEventListener('click', async function () {
+            if (!citaAEliminarId) return;
+            try {
+                await fetch(`${API_BASE}/citas.php?id=${citaAEliminarId}`, { method: 'DELETE' });
+                bootstrap.Modal.getInstance(document.getElementById('cancelModal')).hide();
+                citaAEliminarId = null;
+                cargarCitas();
+                cargarResumen();
+            } catch (e) {
+                alert('Error al cancelar la cita');
+            }
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Cargar lista de pacientes en el select del modal
+        // ─────────────────────────────────────────────────────────────
+        async function cargarPacientes() {
+            try {
+                const res = await fetch(`${API_BASE}/pacientes.php`);
+                const pacientes = await res.json();
+                const select = document.getElementById('patient');
+
+                pacientes.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.nombre} ${p.apellido}`;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('No se pudo cargar pacientes:', e);
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Guardar nueva cita
+        // ─────────────────────────────────────────────────────────────
+        document.getElementById('formNuevaCita').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnGuardarCita');
+            const alerta = document.getElementById('modalAlert');
+            btn.disabled = true;
+
+            const payload = {
+                paciente_id: document.getElementById('patient').value,
+                odontologo_id: usuarioData.id,
+                fecha: document.getElementById('date').value,
+                hora: document.getElementById('time').value,
+                procedimiento: document.getElementById('procedure').value,
+                notas: document.getElementById('notes').value,
+                estado: 'pendiente'
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/citas.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('appointmentModal')).hide();
+                    document.getElementById('formNuevaCita').reset();
+                    cargarCitas();
+                    cargarResumen();
+                } else {
+                    alerta.textContent = data.error || 'Error al guardar la cita';
+                    alerta.classList.remove('d-none');
+                }
+            } catch (err) {
+                alerta.textContent = '⚠️ No se pudo conectar con el servidor';
+                alerta.classList.remove('d-none');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Editar cita (Abrir modal y cargar datos)
+        // ─────────────────────────────────────────────────────────────
+        function iniciarEdicion(id, paciente, fecha, hora, procedimiento, notas) {
+            document.getElementById('editCitaId').value = id;
+            document.getElementById('editPatientName').value = paciente;
+            document.getElementById('editDate').value = fecha;
+            document.getElementById('editTime').value = hora;
+            document.getElementById('editProcedure').value = procedimiento;
+            document.getElementById('editNotes').value = notas;
+
+            document.getElementById('editModalAlert').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('editAppointmentModal')).show();
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        //  Guardar cambios de edición
+        // ─────────────────────────────────────────────────────────────
+        document.getElementById('formEditarCita').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnActualizarCita');
+            const alerta = document.getElementById('editModalAlert');
+            const id = document.getElementById('editCitaId').value;
+
+            btn.disabled = true;
+
+            const payload = {
+                id: id,
+                fecha: document.getElementById('editDate').value,
+                hora: document.getElementById('editTime').value,
+                procedimiento: document.getElementById('editProcedure').value,
+                notas: document.getElementById('editNotes').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/citas.php`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('editAppointmentModal')).hide();
+                    cargarCitas();
+                    cargarResumen();
+                } else {
+                    alerta.textContent = data.error || 'Error al actualizar la cita';
+                    alerta.classList.remove('d-none');
+                }
+            } catch (err) {
+                alerta.textContent = '⚠️ No se pudo conectar con el servidor';
+                alerta.classList.remove('d-none');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Inicializar panel
+        // ─────────────────────────────────────────────────────────────
+        cargarResumen();
+        cargarCitas();
+        cargarHistorial();
+        cargarPacientes();
+    </script>
+</body>
+
+</html>
