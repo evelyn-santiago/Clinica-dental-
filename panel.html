@@ -395,8 +395,9 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="pTelefono" class="form-label">Teléfono</label>
-                                <input type="tel" id="pTelefono" class="form-control">
+                                <label for="pTelefono" class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                <input type="tel" id="pTelefono" class="form-control" placeholder="10 dígitos" pattern="[0-9]{10}" inputmode="numeric" maxlength="10">
+                                <small class="text-muted d-block mt-1">Debe contener exactamente 10 dígitos</small>
                             </div>
                             <div class="col-md-6">
                                 <label for="pEmail" class="form-label">Email</label>
@@ -583,6 +584,35 @@
             sessionStorage.removeItem('usuario');
             window.location.href = 'logi.html';
         });
+
+        // ─────────────────────────────────────────────────────────────
+        //  Validación de teléfono
+        // ─────────────────────────────────────────────────────────────
+        function validarTelefono(telefono) {
+            // Limpiar espacios y caracteres especiales
+            const telefonoLimpio = telefono.replace(/\D/g, '');
+            
+            // Verificar que tenga exactamente 10 dígitos
+            if (telefonoLimpio.length !== 10) {
+                return {
+                    valido: false,
+                    mensaje: 'El teléfono debe contener exactamente 10 dígitos'
+                };
+            }
+            
+            // Verificar que no sea todo ceros
+            if (telefonoLimpio === '0000000000') {
+                return {
+                    valido: false,
+                    mensaje: 'El teléfono no puede ser todo ceros'
+                };
+            }
+            
+            return {
+                valido: true,
+                mensaje: 'Teléfono válido'
+            };
+        }
 
         // ─────────────────────────────────────────────────────────────
         //  Helpers de estado de cita
@@ -783,12 +813,25 @@
         document.getElementById('formNuevoPaciente').addEventListener('submit', async function (e) {
             e.preventDefault();
             const btn = document.getElementById('btnGuardarPaciente');
+            const alerta = document.getElementById('patientModalAlert');
             btn.disabled = true;
+
+            // Validar teléfono
+            const telefonoValue = document.getElementById('pTelefono').value.trim();
+            if (telefonoValue) {
+                const validacion = validarTelefono(telefonoValue);
+                if (!validacion.valido) {
+                    alerta.textContent = '⚠️ ' + validacion.mensaje;
+                    alerta.classList.remove('d-none');
+                    btn.disabled = false;
+                    return;
+                }
+            }
 
             const payload = {
                 nombre: document.getElementById('pNombre').value,
                 apellido: document.getElementById('pApellido').value,
-                telefono: document.getElementById('pTelefono').value,
+                telefono: telefonoValue.replace(/\D/g, ''),
                 email: document.getElementById('pEmail').value,
                 fecha_nacimiento: document.getElementById('pFechaNac').value,
                 direccion: document.getElementById('pDireccion').value
@@ -823,9 +866,20 @@
             }
         });
 
+        // Validación en tiempo real del teléfono
+        document.getElementById('pTelefono').addEventListener('input', function (e) {
+            // Solo permitir números
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 10) {
+                valor = valor.slice(0, 10);
+            }
+            e.target.value = valor;
+        });
+
         // Limpiar alertas al abrir el modal de paciente
         document.getElementById('patientModal').addEventListener('show.bs.modal', function () {
             document.getElementById('patientModalAlert').classList.add('d-none');
+            document.getElementById('pTelefono').value = ''; // Limpiar el campo
         });
 
         // ─────────────────────────────────────────────────────────────
